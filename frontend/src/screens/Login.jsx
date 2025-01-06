@@ -1,16 +1,25 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from '../config/axios'
+import {UserContext} from '../context/user.context'
+
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
+    const {setUser} = useContext(UserContext)
+
     function submitHandler(e) {
         e.preventDefault()
         axios.post('/users/login', {email,password})
-        .then((res)=>{navigate('/')})
+        .then((res)=>{
+            localStorage.setItem('token', res.data.token)
+            setUser(res.data.user)
+            navigate('/')
+        })
         .catch((err)=>{console.log(err.response.data)})
     }
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">

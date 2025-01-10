@@ -19,3 +19,42 @@ export const createProject = async(req, res) => {
         res.status(400).send(err.message);
     }
 }
+
+export const getAllProject = async(req, res) => {
+    try {
+        const loggedInUser = await userModel.findOne({email: req.user.email})
+        const userId = loggedInUser._id
+
+        const projects = await projectService.getAllProject(userId)
+        res.status(200).json(projects)
+    }
+    catch(err) {
+        res.status(404).json({error: err.message})
+    }
+}
+
+export const addUserToProject = async(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) return res.status(400).json({errors: errors.array()})
+
+    try {
+        const {users, projectId} = req.body;
+        const loggedInUser = await userModel.findOne({email: req.user.email})
+        const userId = loggedInUser._id
+
+        const project = await projectService.addUserToProject({users, projectId, userId})
+        res.status(200).json(project)
+    }
+    catch(err) {
+        res.status(400).send(err.message)
+    }
+}
+export const getProjectById = async(req, res) => {
+    try {
+        const {projectId} = req.params;
+        const project = await projectService.getProjectById(projectId)
+        res.status(200).json(project)
+    } catch(err) {
+        res.status(400).send(err.message)
+    }
+}
